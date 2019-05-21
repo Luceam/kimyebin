@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+     <link rel="stylesheet" href="style.css">
+	<title>20180601 김예빈</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+</head>
+<body>
+<div class="fixed1" >
+인터넷활용<br>
+20180601<br>
+김예빈
+</div>
+
+<div class="fixed2" >
+  <a href="홈페이지.html" target="_self"><i class="fas fa-home"></i> HOME</a>
+</div>
+
+
+
+<div><img src="꽃.png" alt="grapic"></div>
+
+<b><p style="text-align:center; color:RGB(255, 89, 71);">이중연결리스트 프로그램</p></b>
+<pre style="padding:0px 500px 0px 500px;">
+#include < stdio.h>
+#include < stdlib.h>
+#include < memory.h>
+typedef struct DNode {
+    int data; struct DNode *llink, *rlink;
+}DNode;
+//이중연결리스트에 삽입함수
+struct DNode * Dinsert(struct DNode *L, int item)
+{
+    struct DNode *p = L, *node;
+
+    node =(struct DNode *)malloc(sizeof(struct DNode)); 
+    node->data = item;
+
+    if (L == NULL) //빈 리스트일 경우
+       { L = node; L->llink = L->rlink = NULL; return L; }
+    //삽입될 자기 위치 검색
+    while (p->data <= node->data && p->rlink != NULL)
+        p = p->rlink;
+
+    if (p->data > node->data && p->llink == NULL) //맨앞에 삽입할 경우
+    {
+        node->llink = NULL; node->rlink = p; L = node; 
+        return L;
+    }
+    else if (p->data <= node->data && p->rlink == NULL)//맨끝에 삽입할 경우
+    {
+        node->llink = p; p->rlink = node; node->rlink = NULL;
+        return L;
+    }
+    else //중간에 삽입할 경우
+    {    p = p->llink;
+        node->llink = p; //1
+        node->rlink = p->rlink; //2
+        p->rlink = node; //3
+        node->rlink->llink = node; //4
+        return L;
+    }
+}
+void print(struct DNode *L)
+{
+    struct DNode *p = L;
+    while (p != NULL)
+    { printf("%d ==> ", p->data); p = p->rlink; }
+    printf("끝 \n ");
+}
+void print_ch(struct DNode *L)
+{
+    struct DNode *p = L;
+    while (p != NULL)
+    { printf("%c ==> ", p->data); p = p->rlink; }
+    printf("끝 \n ");
+}
+
+struct DNode * Ddelete(struct DNode * L, int item)
+{
+    struct DNode *p = L;
+    if (L == NULL) 
+       {printf("\n 빈 리스트이므로 삭제 불가 \n"); return L;}
+    while (item != p->data && p->rlink != NULL)
+        p = p->rlink;
+
+    if (item == p->data && p->llink == p->rlink) 
+       {L = NULL; return L; }
+    if (item == p->data && p->rlink == NULL) //맨끝 노드 삭제
+       { p->llink->rlink = NULL; free(p); return L;}
+    if (item == p->data && p->rlink != NULL) //삭제노드
+       { if (p->llink == NULL) //맨앞 노드 삭제
+            { L = p->rlink; L->llink = NULL; free(p); return L; }
+         else //중간 노드 삭제
+         { p->llink->rlink = p->rlink;
+           p->rlink->llink = p->llink; 
+           free(p); return L; 
+         } 
+    }
+}
+void main()
+{
+    int item, menu, ch, cnt_U=0 ,cnt_L=0, cnt_D=0, cnt_S=0, total=0;
+    struct DNode *list = NULL, *p, *u, *l, *d, *s;
+    u = l = d = s = NULL;
+    while (1)
+    {
+        printf("\n 이중연결리스트 메뉴 1)삽입 2)삭제 3)출력 4)검색 5)문자열 입력 6)종료 : ");
+        scanf("%d", &menu);
+        if (menu == 6) break;
+        switch (menu) {
+         case 1://이중연결리스트에 삽입
+             printf("\n 이중연결리스트에 삽입할 정수 입력 : ");
+             scanf("%d", &item);
+             list = Dinsert(list, item);
+             break;
+         case 2://이중연결리스트에서 삭제
+             printf("\n 이중연결리스트에서 삭제할 정수 입력 : ");
+             scanf("%d", &item);
+             list = Ddelete(list, item);
+             break;
+         case 3://이중연결리스트를 출력
+             print(list);
+             break;
+         case 4://이중연결리스트에서 검색
+             printf("\n 이중연결리스트에서 검색할 정수 입력 : ");
+             scanf("%d", &item);
+             p = list; //포인터 p 사용
+             while (p->data != item && p->rlink != NULL)
+                 p = p->rlink;             
+             //정확하게 찾았든지, 끝까지 검색해도 못찾았든지   
+             if (p->data == item)
+                 printf("\n %d는 %p번지에 있음\n", item, p);
+             else if (p->rlink == NULL && p->data == item)
+                     printf("\n %d는 %p번지에 있음\n", item, p);   
+                  else if (p->rlink == NULL && p->data != item)
+                         printf("\n %d는 리스트에 없음\n", item); 
+             break;
+         case 5://문자열 입력해서 종류별로 연결리스트 구성
+             ch = getchar();
+             printf("\n 문자열 입력 : ");
+             while (1) {
+                 ch = getchar();
+                 if (ch == '\n') break;
+                 total++;
+                 if (ch >= 'A' && ch <= 'Z') //대문자리스트에 삽입
+                 { cnt_U++; u = Dinsert(u, ch); }
+                 else if (ch >= 'a' && ch <= 'z') //소문자리스트에삽입
+                 {  cnt_L++; l = Dinsert(l, ch); }
+                 else if (ch >= '0' && ch <= '9') //숫자문자리스트에삽입
+                 { cnt_D++; d = Dinsert(d, ch);  }
+                 else //특수문자리스트에 삽입
+                 { cnt_S++; s = Dinsert(s, ch); }
+             }
+            printf("\n 대문자 리스트 : ");
+             print_ch(u); printf(" : 총 %d개", cnt_U);
+             printf("\n 소문자 리스트 : ");
+             print_ch(l); printf(" : 총 %d개", cnt_L);
+            printf("\n 숫자문자 리스트 : ");
+             print_ch(d); printf(" : 총 %d개", cnt_D);
+             printf("\n 특수문자 리스트 : ");
+             print_ch(s); printf(" : 총 %d개", cnt_S);
+             printf(" 입력문자 총 개수 :  %d개 \n", total);
+             break;
+         default : 
+             break;
+        }
+    }
+}
+</pre>
+
+
+</body>
+</html>
